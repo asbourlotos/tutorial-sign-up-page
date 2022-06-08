@@ -16,7 +16,7 @@ app.get("/", function(req, res) {
 });
 
 mailchimp.setConfig({
-    apiKey: "6184f005e5c0330bf881d76b0883e667-us10",
+    //apiKey: "replace with api key",
     server: "us10"
 });
 
@@ -69,7 +69,7 @@ app.post("/", function(req, res) {
     // OLD OPTIONS
     // const options = {
     //     method: "POST",
-    //     auth: "alexbourlotos:6184f005e5c0330bf881d76b0883e667-us10"
+    //     auth: "alexbourlotos:<apikey>"
     // }
 
     // OLD REQUEST
@@ -83,12 +83,16 @@ app.post("/", function(req, res) {
     // request.end;
 });
 
+app.post("/failure", function(req, res) {
+    res.redirect("/");
+});
+
 app.listen(port, function() {
     console.log("Server is running on port " + port + ".");
 });
 
 // API KEY
-// 6184f005e5c0330bf881d76b0883e667-us10
+// get from mailchimp site
 
 // LIST ID
 // 6366bb58df
