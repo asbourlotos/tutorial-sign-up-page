@@ -1,6 +1,7 @@
 const express = require("express");
 const https = require("https");
 const bodyParser = require("body-parser");
+const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const app = express();
 
@@ -14,13 +15,83 @@ app.get("/", function(req, res) {
     res.sendFile(__dirname + "/signup.html");
 });
 
+mailchimp.setConfig({
+    apiKey: "6184f005e5c0330bf881d76b0883e667-us10",
+    server: "us10"
+});
+
 app.post("/", function(req, res) {
-    var firstName = req.body.fName;
-    var lastName = req.body.lName;
-    var email = req.body.email;
-    console.log(firstName, lastName, email);
+    const firstName = req.body.fName;
+    const lastName = req.body.lName;
+    const email = req.body.email;
+    const listId = "6366bb58df";
+    // MAILCHIMP DATA OBJECT
+    const subscribingUser = {
+        firstname: firstName,
+        lastName: lastName,
+        email: email,
+    };
+    // OLD COURSE CODE. ABOVE IS MAILCHIMP DATA
+    // const data = {
+    //     members: [
+    //         {
+    //             email_address: email,
+    //             status: "subscribed",
+    //             merge_fields: {
+    //                 FNAME: firstName,
+    //                 LNAME: lastName
+    //             }
+    //         }
+    //     ]
+    // }
+    // const jsonData = JSON.stringify(data);
+
+    // UPLOADING DATA TO SERVER
+    async function run() {
+        const response = await mailchimp.lists.addListMember(listId, {
+            email_address: subscribingUser.email,
+            status: "subscribed",
+            merge_fields: {
+                FNAME: subscribingUser.firstname,
+                LNAME: subscribingUser.lastName,
+            }
+        });
+        res.sendFile(__dirname + "/success.html");
+        console.log("Successfully added contact as an audience member. The contact's id is " + response.id + ".");
+    }
+
+    // EXECUTING RUN TO RUN FUNCTION AND CATCH ERROR
+    run().catch(e => res.sendFile(__dirname + "/failure.html"));
+
+    // OLD URL
+    //const url = "https://us10.api.mailchimp.com/3.0/lists/6366bb58df";
+
+    // OLD OPTIONS
+    // const options = {
+    //     method: "POST",
+    //     auth: "alexbourlotos:6184f005e5c0330bf881d76b0883e667-us10"
+    // }
+
+    // OLD REQUEST
+    // const request = https.request(url, options, function(response) {
+    //     response.on("data", function(data) {
+    //         console.log(JSON.parse(data));
+    //     });
+    // });
+
+    // request.write(jsonData);
+    // request.end;
 });
 
 app.listen(port, function() {
     console.log("Server is running on port " + port + ".");
 });
+
+// API KEY
+// 6184f005e5c0330bf881d76b0883e667-us10
+
+// LIST ID
+// 6366bb58df
+
+// MAILCHIMP URL
+// https://us10.admin.mailchimp.com/
